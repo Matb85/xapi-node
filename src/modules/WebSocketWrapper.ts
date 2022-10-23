@@ -7,8 +7,7 @@ function getWS(): Promise<typeof WS> {
   if (process.env.ES_TARGET == 'esm') {
     return import('ws')
   } else {
-    // eslint-disable-next-line
-    return new Promise(resolve => resolve(require('ws')))
+    return new Promise(resolve => resolve(require('ws'))) // eslint-disable-line
   }
 }
 
@@ -47,7 +46,8 @@ export class WebSocketWrapper extends Listener {
     this._connectionTimeout.clear()
     if (isNodeJS()) {
       // NodeJS module
-      getWS().then(WebSocketClient => {
+      getWS().then(ws => {
+        const WebSocketClient = ((ws as any).default as typeof WS) || ws
         this.ws = new WebSocketClient(this.url)
         this.ws.on('open', () => {
           this._status = true
